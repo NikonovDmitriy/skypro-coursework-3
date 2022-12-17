@@ -1,2 +1,55 @@
-package com.example.skyprocoursework3.services.examiner;public class ExaminerServiceImplTest {
+package com.example.skyprocoursework3.services.examiner;
+
+import com.example.skyprocoursework3.models.Task;
+import com.example.skyprocoursework3.services.ExaminerService;
+import com.example.skyprocoursework3.services.task.java.JavaTaskService;
+import com.example.skyprocoursework3.services.task.math.MathTaskService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class ExaminerServiceImplTest {
+
+    @Mock
+    private JavaTaskService javaTaskService;
+    @Mock
+    private MathTaskService mathTaskService;
+
+    @Test
+    public void shouldReturnCollectionOfTasks() {
+        ExaminerService examinerService = new ExaminerServiceImpl(javaTaskService, mathTaskService,
+                new ExaminerServiceUtil());
+
+        List<Task> javaTasks = List.of(
+                new Task("1", "111"),
+                new Task("2", "222")
+        );
+        List<Task> mathTasks = List.of(
+                new Task("!", "!!!"),
+                new Task("@", "@@@")
+        );
+        Set<Task> actual = new HashSet<>(List.of(
+                mathTasks.get(0),
+                javaTasks.get(0)
+        ));
+
+        when(javaTaskService.getAll()).thenReturn(javaTasks);
+        when(mathTaskService.getAll()).thenReturn(mathTasks);
+        when(javaTaskService.getRandomTask()).thenReturn(mathTasks.get(0));
+        when(mathTaskService.getRandomTask()).thenReturn(javaTasks.get(0));
+
+        Collection<Task> expected = examinerService.getTasks(2);
+
+        assertEquals(expected, actual);
+    }
 }
